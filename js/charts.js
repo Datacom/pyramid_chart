@@ -43,11 +43,11 @@ function cleanup(d) {
 
 queue()
     .defer(d3.csv,  "data/demographic_data.csv")
-    .defer(d3.csv,  "dictionaries/NMS_authority_dict.csv")
+   // .defer(d3.csv,  "dictionaries/NMS_authority_dict.csv")
     .defer(d3.csv,  "dictionaries/titles.csv")
     .await(showCharts);
 
-function showCharts(err, data, auth_dict, title_text) {
+function showCharts(err, data, title_text) {
 
 //We use dictionary .csv's to store things we might want to map our data to, such as codes to names, names to abbreviations etc.
   
@@ -62,13 +62,13 @@ function showCharts(err, data, auth_dict, title_text) {
         _title_text[name]=entry;     
   }
   
-  for (i in auth_dict) {
-    entry = auth_dict[i]
-    trimAll(entry)
-    name = entry.Name
-    councilNames.push(name);
-    _auth_dict[entry.Name]=entry;
-  } 
+//  for (i in auth_dict) {
+//    entry = auth_dict[i]
+//    trimAll(entry)
+//    name = entry.Name
+//    councilNames.push(name);
+//    _auth_dict[entry.Name]=entry;
+//  } 
 
 
   for (i in data) {
