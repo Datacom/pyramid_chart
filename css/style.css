@@ -1,0 +1,168 @@
+#download {
+  margin-right: 10px;
+}
+
+#table {
+  margin-left: 30px;
+  width:95%;
+}
+
+#table td {
+  font-size: 0.8em;
+}
+
+#table th {
+  font-size: 0.8em;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+
+#tabs {
+  margin-left:15px;
+  padding-top: 0px;
+}
+
+#column_selection {
+  padding-left:30px;
+}
+
+
+.dc-chart g.row text {
+  fill:black;
+}
+
+.dc-chart g.row text.row.dim {
+  fill:grey;
+}
+
+.dc-chart .pie-slice {
+  fill:black;
+}
+
+.dc-chart .pie-slice path {
+    stroke: white;
+}
+
+.dc-chart .selected path {
+    stroke-width: 0;
+    stroke: #ccc;
+    fill-opacity: 1;
+}
+
+.dc-chart legend {
+  font-size: 1em;
+  margin-bottom: 2px;
+  line-height: 20px;
+  margin-top:10px;
+  border-bottom: 0px;
+}
+
+.subtitle {
+  font-size: 0.7em;
+}
+
+#map svg {
+  background-color:#efefef;
+}
+
+#district_map g.deselected path  {
+  stroke:white;
+  stroke-width:1px;
+}
+
+#region_map g.deselected path  {
+  stroke:white;
+  stroke-width:1px;
+}
+
+.just_a_number {
+  font-size: 1.4em;
+}
+
+.legend.dc-chart g.row rect {
+    fill-opacity: 0.8;
+    cursor: default;
+}
+
+.legend.dc-chart g.row text {
+    cursor: default;
+}
+
+.legend.dc-chart g.row rect:hover {
+    fill-opacity: 0.8;
+}
+
+.dc-chart {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;  
+}
+
+.nav {
+  margin-left: 30px;
+}
+
+.container-flow > .reset {
+  margin-right: 30px;
+}
+
+.dc-chart {
+  background-color: #fbfbfb;
+  border: 5px;
+  border-style: solid;
+  border-color: white;
+}
+
+.dc-chart .reset {
+    font-size: 1em;
+}
+
+.reset btn btn-primary{
+  display: inherit;
+}
+
+.dc-table-label{
+  font-weight: bold;
+  background-color: #ccccc1;
+}
+
+.dc-table-head{
+  background-color: #BBE69C;
+  padding-top: 10px;
+}
+
+#tabs{
+  border-bottom: 1px solid #e5e5e5;
+  
+}
+
+.tab{
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 9;
+  padding-bottom: 8;
+  text-align: center;
+  border: 1px solid #e5e5e5;
+  margin-right: 2;
+  cursor:pointer;
+}
+
+.tab.selected {
+  background:#e5e5e5;
+}
+
+.tab.hasFilter{
+  background:#fcdcdc;
+  
+}
+.tab.selected.hasFilter{
+  background:#ddc4c4;
+}
+
+.grey {
+  opacity: 0.5;
+}
