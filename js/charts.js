@@ -130,7 +130,7 @@ function showCharts(err, data, title_text) {
   age_group = age.group().reduceSum(function(d){return d.Value})
    
 //
-  age_chart = pyramidChart('#tree')
+  age_chart = dc.pyramidChart('#tree')
     .dimension(age)
     .group(age_group)
     .valueAccessor(valueAccessor)
@@ -146,14 +146,14 @@ function showCharts(err, data, title_text) {
     //.label(function(){return ' '})
     .elasticX(true)
     .labelOffsetX(20)
-
-  age_chart.xAxis().tickFormat(function(x) {return d3.format('s')(Math.abs(x))})
+  
+    age_chart.xAxis().tickFormat(function(x) {return d3.format('s')(Math.abs(x))})
   
   region = ndx.dimension(function(d) {return d.sexRegion});
   region_group = region.group().reduceSum(function(d){return d.Value})
    
 //
-  region_chart = pyramidChart('#region')
+  region_chart = dc.pyramidChart('#region')
     .dimension(region)
     .group(region_group)
     .valueAccessor(valueAccessor)
@@ -180,10 +180,11 @@ function showCharts(err, data, title_text) {
                   "Southland Region"])
     .transitionDuration(1000)
     .height(600)
-    //.title(function(d,i){return i})
-    //.label(function(){return ' '})
     .elasticX(true)
-    .labelOffsetX(20)
+    //.label(function(d){return d.key})
+    .twoLabels(false)// defaults to true. if false, .label defaults to .rowAccessor
+    //.label(function(d){return d.key})
+    //.labelOffsetX(0)
 
   region_chart.xAxis().tickFormat(function(x) {return d3.format('s')(Math.abs(x))})
   

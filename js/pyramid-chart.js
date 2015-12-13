@@ -26,9 +26,9 @@ var chart2 = dc.rowChart('#chart-container2', 'chartGroupA');
 ```
 
 **/
-var pyramidChart = function (parent, chartGroup) {
+  dc.pyramidChart = function (parent, chartGroup) {
 
-    var _g;
+var _g;
 
     var _labelOffsetX = 10;
     var _labelOffsetY = 15;
@@ -52,15 +52,21 @@ var pyramidChart = function (parent, chartGroup) {
     var _xAxis = d3.svg.axis().orient('bottom');
 
     var _rowData;
+    var _twoLabels = true;
     
     var rowOrder = []
     var rowList =[]
     var _rowOrdering = d3.descending
+    var effective_i = 0 
+    var yTrans = 0
+    var xTrans = 0
+    var width = 0
+
     
     var getRowList = function(_rowData){  
           for (i in _rowData){
-            d = _rowData[i]
-            if (rowList.indexOf(_rowAccessor(d,i)) < 0){rowList.push(_rowAccessor(d,i))}
+            //d = _rowData[i]
+            if (rowList.indexOf(_rowAccessor(_rowData[i],i)) < 0){rowList.push(_rowAccessor(_rowData[i],i))}
             }
 
           return rowList
@@ -108,7 +114,7 @@ var pyramidChart = function (parent, chartGroup) {
         return _chart.cappedKeyAccessor(d) + ': ' + _chart.cappedValueAccessor(d);
     });
 
-    _chart.label(_chart.cappedKeyAccessor);
+    _twoLabels ? _chart.label(_chart.cappedKeyAccessor) : _chart.label(_chart.rowAccessor);
 
     /**
      #### .x([scale])
@@ -195,7 +201,7 @@ var pyramidChart = function (parent, chartGroup) {
                                            } else {rowOrder=_rowOrdering}  
       
       //this bit positions the bars on the vertical.
-      rectTransform = function(d,i){
+      function rectTransform(d,i){
         effective_i = rowOrder.indexOf(_rowAccessor(d,i))
         yTrans = ((effective_i + 1) * _gap + effective_i * height)
         return 'translate(0,'+yTrans+')'       
@@ -232,13 +238,13 @@ var pyramidChart = function (parent, chartGroup) {
     }
 
   function labelPosition(d){
-    offset = _labelOffsetX
+    //offset = _labelOffsetX
     if (_leftColumn(d)) {return {textAnchor: 'end',
-                               position: rootValue() - offset 
+                               position: rootValue() - _labelOffsetX
                               } 
                       }
     else { return {textAnchor: 'start',
-                   position: rootValue() + offset 
+                   position: rootValue() + _labelOffsetX
                   } 
       
     } 
@@ -247,22 +253,41 @@ var pyramidChart = function (parent, chartGroup) {
   
     function createLabels(rowEnter) {
         if (_chart.renderLabel()) {
+          if(_twoLabels){
             rowEnter.append('text')
                     .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
                     .attr('text-anchor',function(d){return labelPosition(d).textAnchor})
               .on('click', onClick);
+          } else{
+            
+            rowEnter.append('text')
+                    .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
+                    .attr('text-anchor','middle')
+              .on('click', onClick);
+          }
+          
         }
         if (_chart.renderTitleLabel()) {
+          if(_twoLabels){
             rowEnter.append('text')
                     .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
                     .attr('text-anchor',function(d){return labelPosition(d).textAnchor})
                     .attr('class', _titleRowCssClass)
                 .on('click', onClick);
+          } 
+          else { 
+           rowEnter.append('text')
+                    .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
+                    .attr('text-anchor','middle')
+                    .attr('class', _titleRowCssClass)
+                .on('click', onClick); 
+            }
         }
     }
 
     function updateLabels(rows) {
         if (_chart.renderLabel()) {
+          if (_twoLabels) {
             var lab = rows.select('text')
                 //.attr('x', _labelOffsetX)
                 .attr('y', _labelOffsetY)
@@ -274,10 +299,23 @@ var pyramidChart = function (parent, chartGroup) {
                 .text(function (d) {
                     return _chart.label()(d);
                 });
+          }
+          else {
+           var lab = rows.select('text')
+                .attr('x', 0)
+                .attr('y', _labelOffsetY)
+                .attr('dy', _dyOffset)
+                .on('click', onLabelClick)
+                .attr('class', function (d, i) {
+                    return _rowCssClass + ' _' + i;
+                })
+                .text(function (d) {return _leftColumn(d) ? _chart.label()(d) : ''}); 
+          }
             dc.transition(lab, _chart.transitionDuration())
                 //.attr('transform', translateX);
         }
         if (_chart.renderTitleLabel()) {
+          if (_twoLabels){
             var titlelab = rows.select('.' + _titleRowCssClass)
                     //.attr('x', _chart.effectiveWidth() - _titleLabelOffsetX)
                     .attr('y', _labelOffsetY)
@@ -289,6 +327,19 @@ var pyramidChart = function (parent, chartGroup) {
                     .text(function (d) {
                         return _chart.title()(d);
                     });
+          } 
+          else {
+           var titlelab = rows.select('.' + _titleRowCssClass)
+                    .attr('x', 0)
+                    .attr('y', _labelOffsetY)
+                    .attr('text-anchor', 'end')
+                    .on('click', onLabelClick)
+                    .attr('class', function (d, i) {
+                        return _titleRowCssClass + ' _' + i ;
+                    })
+                    .text(function (d) {return _leftColumn(d) ? _chart.label()(d) : ''}); 
+            
+          }
             dc.transition(titlelab, _chart.transitionDuration())
                // .attr('transform', translateX);
         }
@@ -309,6 +360,21 @@ var pyramidChart = function (parent, chartGroup) {
 
     function onClick(d) {
         _chart.onClick(d);
+    }
+    
+    function onLabelClick(d){
+        //console.log(d, _rowAccessor(d))
+        g = _chart.group().all()
+        row_id = _rowAccessor(d)
+        //console.log(g,row_id)
+        
+        for (i in g ) {
+         if (_rowAccessor(g[i]) == row_id){ 
+           _chart.filter(g[i].key)
+           dc.redrawAll()
+         }  
+        }
+      
     }
 
     function translateX(d,i) {//stick LHS in here
@@ -493,6 +559,15 @@ _chart.rowOrdering = function (o) {
         return _chart;
     };  
 
+  _chart.twoLabels = function (o) {
+        if (!arguments.length) {
+            return _twoLabels;
+        }
+        _twoLabels = o; 
+        _labelOffsetX = _twoLabels ? 10 : 0
+        _chart.label(_chart.rowAccessor())
+        return _chart;
+    };  
  
   
     function isSelectedRow (d) {
