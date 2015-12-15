@@ -146,6 +146,7 @@ function showCharts(err, data, title_text) {
     //.label(function(){return ' '})
     .elasticX(true)
     .labelOffsetX(20)
+   
   
     age_chart.xAxis().tickFormat(function(x) {return d3.format('s')(Math.abs(x))})
   
@@ -181,9 +182,11 @@ function showCharts(err, data, title_text) {
     .transitionDuration(1000)
     .height(600)
     .elasticX(true)
-    //.label(function(d){return d.key})
+    //.label(function(d){return d.key.split(', ')[1].substr(0,5)})
     .twoLabels(false)// defaults to true. if false, .label defaults to .rowAccessor
-    //.label(function(d){return d.key})
+    .columnLabels(['Male','Female'])
+    .columnLabelPosition([40,25]) //[in,down], in pix
+    //.label(function(){return 'fart'})
     //.labelOffsetX(0)
 
   region_chart.xAxis().tickFormat(function(x) {return d3.format('s')(Math.abs(x))})

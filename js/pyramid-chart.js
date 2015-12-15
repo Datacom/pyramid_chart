@@ -28,7 +28,7 @@ var chart2 = dc.rowChart('#chart-container2', 'chartGroupA');
 **/
   dc.pyramidChart = function (parent, chartGroup) {
 
-var _g;
+    var _g;
 
     var _labelOffsetX = 10;
     var _labelOffsetY = 15;
@@ -44,7 +44,8 @@ var _g;
     var _renderTitleLabel = false;
 
     var _chart = dc.capMixin(dc.marginMixin(dc.colorMixin(dc.baseMixin({}))));
-
+    
+    var _label =_chart.label();
     var _x;
 
     var _elasticX;
@@ -53,7 +54,8 @@ var _g;
 
     var _rowData;
     var _twoLabels = true;
-    
+    var _columnLabels = ['',''];
+    var _columnLabelPosition = [5,10];
     var rowOrder = []
     var rowList =[]
     var _rowOrdering = d3.descending
@@ -61,7 +63,7 @@ var _g;
     var yTrans = 0
     var xTrans = 0
     var width = 0
-
+    var pos;
     
     var getRowList = function(_rowData){  
           for (i in _rowData){
@@ -104,7 +106,8 @@ var _g;
         _g = _chart.svg()
             .append('g')
             .attr('transform', 'translate(' + _chart.margins().left + ',' + _chart.margins().top + ')');
-
+     
+      
         drawChart();
 
         return _chart;
@@ -251,14 +254,23 @@ var _g;
     
   }
   
+    
+    
     function createLabels(rowEnter) {
         if (_chart.renderLabel()) {
           if(_twoLabels){
+           
             rowEnter.append('text')
                     .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
                     .attr('text-anchor',function(d){return labelPosition(d).textAnchor})
               .on('click', onClick);
           } else{
+            
+           _g.selectAll('text.columnLabel').data(_columnLabels).enter().append('text').classed('columnLabel',true)
+              .attr('transform',columnLabelPos)
+              .attr('text-anchor',function(d,i){return i ? 'end':'start'})
+              .text(function(d){return d})
+            
             
             rowEnter.append('text')
                     .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
@@ -275,7 +287,13 @@ var _g;
                     .attr('class', _titleRowCssClass)
                 .on('click', onClick);
           } 
-          else { 
+          else {  
+            
+           _g.selectAll('text.columnLabel').data(_columnLabels).enter().append('text').classed('columnLabel',true)
+              .attr('transform',columnLabelPos)
+              .attr('text-anchor',function(d,i){return i ? 'end':'start'})
+              .text(function(d){return d})
+           
            rowEnter.append('text')
                     .attr('transform',function(d){return 'translate('+ labelPosition(d).position +',0)'})
                     .attr('text-anchor','middle')
@@ -283,6 +301,12 @@ var _g;
                 .on('click', onClick); 
             }
         }
+    }
+    
+    function columnLabelPos(d,i){
+     pos = i*(_chart.width()-(_chart.margins().right+ _chart.margins().left)) + _columnLabelPosition[0]*(i ? -1:1)  
+     return 'translate ('+ pos +', '+ _columnLabelPosition[1]+')'
+      
     }
 
     function updateLabels(rows) {
@@ -317,7 +341,6 @@ var _g;
         if (_chart.renderTitleLabel()) {
           if (_twoLabels){
             var titlelab = rows.select('.' + _titleRowCssClass)
-                    //.attr('x', _chart.effectiveWidth() - _titleLabelOffsetX)
                     .attr('y', _labelOffsetY)
                     .attr('text-anchor', 'end')
                     .on('click', onClick)
@@ -341,7 +364,6 @@ var _g;
             
           }
             dc.transition(titlelab, _chart.transitionDuration())
-               // .attr('transform', translateX);
         }
     }
 
@@ -363,11 +385,8 @@ var _g;
     }
     
     function onLabelClick(d){
-        //console.log(d, _rowAccessor(d))
         g = _chart.group().all()
         row_id = _rowAccessor(d)
-        //console.log(g,row_id)
-        
         for (i in g ) {
          if (_rowAccessor(g[i]) == row_id){ 
            _chart.filter(g[i].key)
@@ -541,7 +560,7 @@ _chart.rowAccessor = function (o) {
   
     /**
     #### .rowOrdering([function] or [array])
-    Orders the rows delivered by .rowAccessor and 
+    Orders the rows delivered by .rowAccessor.
     Function is used as an argument to javascript's sort function. Use a function that follows the same scheme as d3.ascending/d3.descending (described here: https://github.com/mbostock/d3/wiki/Arrays#ordering)
     Array is COMPLETE list of .rowAccessors in  the order you want them.  
     Defaults to d3.ascending.
@@ -557,18 +576,70 @@ _chart.rowOrdering = function (o) {
         else {rowOrder=_rowOrdering} 
          
         return _chart;
-    };  
+    };
+    
+   /**
+    #### .label([function])
+    overwriting .label to enable testing for the existance of a lable.  This is necessary for .twoLabels to default correctly 
+    **/
+    
+  _chart.label = function(o){
+  if (!arguments.length) {
+            return _label;
+        }
 
+  _chart.hasLabel=true;
+  _label = o;
+
+  return _chart;
+  
+}   
+
+   /**
+    #### .twoLabels(boolean)
+    true labels each rect, lable defaults to data.key 
+    false labels each row in the centre, defaults to .rowAccessor(data(d)). This will give the same value for the right and left rects, by definition.     
+
+    **/
+    
   _chart.twoLabels = function (o) {
         if (!arguments.length) {
             return _twoLabels;
         }
         _twoLabels = o; 
         _labelOffsetX = _twoLabels ? 10 : 0
-        _chart.label(_chart.rowAccessor())
+        if (! _twoLabels && ! _chart.hasLabel ){ _label = _chart.rowAccessor() }        
         return _chart;
     };  
- 
+
+  
+  /**
+    #### .columnLabels([array of 2 elements])
+    labels for the left and right hand sides, respectively. Defaults to ['',''].
+  **/
+    
+  _chart.columnLabels =function (o){
+    if (!arguments.length) {
+            return _columnLabels ;
+        }
+    _columnLabels = o;
+    return _chart;
+  }
+  
+  
+ /**
+    #### .columnLabels([array of 2 elements])
+    labels for the left and right hand sides, respectively. Defaults to ['',''].
+  **/
+  
+_chart.columnLabelPosition =function (o){
+    if (!arguments.length) {
+            return _columnLabelPosition ;
+        }
+    _columnLabelPosition = o;
+    return _chart;
+  }  
+    
   
     function isSelectedRow (d) {
         return _chart.hasFilter(_chart.cappedKeyAccessor(d));

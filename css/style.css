@@ -151,6 +151,8 @@
   cursor:pointer;
 }
 
+
+
 .tab.selected {
   background:#e5e5e5;
 }
@@ -165,4 +167,8 @@
 
 .grey {
   opacity: 0.5;
+}
+
+.columnLabel{
+  font-weight: bold;
 }
